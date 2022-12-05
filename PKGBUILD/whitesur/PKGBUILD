@@ -1,0 +1,71 @@
+# Maintainer: Denilson <depaiao a gmail com>
+
+pkgbase=whitesur-kde-complete-git
+pkgname=(whitesur-kde-complete-git)
+_pkgname=WhiteSur
+pkgver=r84.5535e28
+pkgrel=1
+pkgdesc=""
+arch=(any)
+url="https://github.com/vinceliuice/WhiteSur"
+license=('GPL3')
+options=('!strip')
+source=("WhiteSur-kde::git+$url-kde.git"
+        "WhiteSur-gtk-theme::git+$url-gtk-theme.git"
+        "WhiteSur-cursors::git+$url-cursors.git"
+        "WhiteSur-icon-theme::git+$url-icon-theme.git")
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP')
+depends=('git' 'hicolor-icon-theme' 'plasma-desktop' 'konsole' 'kvantum-qt5' 'kwin' 'sddm' 'gtk2' 'gtk-engines' 'gtk-engine-murrine' 'gtk3' 'gtk4')
+makedepends=('git' 'sassc')
+provides=()
+conflicts=( )
+
+pkgver(){
+  cd "$_pkgname-kde"
+  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+package(){
+    pkgdesc="WhiteSur aurorae, color, konsole, sddm, kvantum, icons (Candy), cursor, wallpapers, global and plasma theme, gtk2/3"
+    install -dm755 $pkgdir/{boot/grub/themes,usr/share/{aurorae/themes,color-schemes,icons,konsole,Kvantum,plasma/{desktoptheme,look-and-feel},sddm/themes,themes,wallpapers}}
+
+#    msg2 
+    
+## whitesur plasma
+    cd $_pkgname-kde
+    cp -r aurorae/* "$pkgdir/usr/share/aurorae/themes"
+    cp -r color-schemes/*.colors "$pkgdir/usr/share/color-schemes"
+#    cp -r cursors/$_pkgname-cursors "$pkgdir/usr/share/icons"
+#    cp -r konsole/*.colorscheme "$pkgdir/usr/share/konsole"
+    cp -r Kvantum/* "$pkgdir/usr/share/Kvantum/"
+    cp -r plasma/desktoptheme/$_pkgname* "$pkgdir/usr/share/plasma/desktoptheme"
+    cp -r plasma/desktoptheme/icons "$pkgdir/usr/share/plasma/desktoptheme/$_pkgname"
+    cp -r plasma/desktoptheme/icons "$pkgdir/usr/share/plasma/desktoptheme/$_pkgname-alt"
+    cp -r plasma/desktoptheme/icons "$pkgdir/usr/share/plasma/desktoptheme/$_pkgname-dark"
+    cp -r plasma/look-and-feel/* "$pkgdir/usr/share/plasma/look-and-feel"
+    cp -r wallpaper/$_pkgname "$pkgdir/usr/share/wallpapers"
+    cp -r sddm/$_pkgname "$pkgdir/usr/share/sddm/themes/"
+
+    
+## whitesur cursors
+    mkdir -p "$pkgdir/usr/share/icons/$_pkgname-cursors"
+    cp -r $srcdir/$_pkgname-cursors/dist/* "$pkgdir/usr/share/icons/$_pkgname-cursors"
+
+    
+## whitesur gtk
+    cd $srcdir/$_pkgname-gtk-theme
+    ./install.sh \
+    --dest "$pkgdir/usr/share/themes" \
+    --opacity solid \
+    --icon arch \
+    
+    
+## whitesur icon theme
+    cd $srcdir/$_pkgname-icon-theme
+    ./install.sh \
+    --dest "$pkgdir/usr/share/icons" \
+
+    #find "$pkgdir/usr/share/"{aurorae,color-schemes,icons,konsole,Kvantum,plasma,wallpapers}"" -name ".*" -exec rm -f {} \;
+    find "$pkgdir/usr/share/" -type d -exec chmod 755 '{}' \;
+    find "$pkgdir/usr/share/" -type f -exec chmod 644 '{}' \;
+}

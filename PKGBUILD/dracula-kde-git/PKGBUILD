@@ -1,0 +1,63 @@
+# Maintainer: Denilson <depaiao a gmail com>
+
+pkgbase=dracula-kde-git
+pkgname=(dracula-kde-git)
+_pkgname=Dracula
+pkgver=r277.2452278
+pkgrel=1
+pkgdesc="Complete Dracula theme for KDE Plasma 5"
+arch=(any)
+url="https://github.com/dracula"
+license=('GPL3')
+options=('!strip')
+source=("Dracula::git+$url/gtk/"
+        "Dracula-wallpaper::git+$url/wallpaper/"
+        "Dracula-konsole::git+$url/konsole/"
+        "Dracula-grub::git+$url/grub/"
+        "Dracula-bashtop::git+$url/bashtop/")
+sha256sums=( 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' )
+depends=('git' 'hicolor-icon-theme' 'plasma-desktop' 'konsole' 'kvantum-qt5' 'kwin' 'sddm' 'gtk2' 'gtk3')
+makedepends=('git')
+provides=()
+conflicts=( )
+
+pkgver(){
+  cd "$_pkgname"
+  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+package(){
+    pkgdesc="Dracula aurorae, color, konsole, sddm, kvantum, cursor, wallpapers, global and plasma theme, gtk2/3/4, grub and btop"
+    install -dm755 $pkgdir/{boot/grub/themes,usr/{local/share/btop/themes,share/{aurorae/themes,color-schemes,icons,konsole,Kvantum,plasma/{desktoptheme,look-and-feel},sddm/themes,themes,wallpapers}}}
+
+## dracula plasma
+    cd $_pkgname/kde
+    cp -r aurorae/* "$pkgdir/usr/share/aurorae/themes"
+    cp -r color-schemes/*.colors "$pkgdir/usr/share/color-schemes"
+    cp -r cursors/$_pkgname-cursors "$pkgdir/usr/share/icons"
+    cp -r kvantum/* "$pkgdir/usr/share/Kvantum/"
+#    cp -r plasma/desktoptheme/* "$pkgdir/usr/share/plasma/desktoptheme"
+#    cp -r plasma/look-and-feel/* "$pkgdir/usr/share/plasma/look-and-feel"
+    cp -r plasma/* "$pkgdir/usr/share/plasma/"
+    cp -r sddm/* "$pkgdir/usr/share/sddm/themes/"
+    mkdir -p "$pkgdir/usr/share/wallpapers/$_pkgname"
+    cp -r $srcdir/$_pkgname-wallpaper/{arch.png,kde.png} "$pkgdir/usr/share/wallpapers/$_pkgname"
+    cp -r $srcdir/$_pkgname-konsole/*.colorscheme "$pkgdir/usr/share/konsole"
+
+## dracula gtk
+    cd $srcdir/$_pkgname
+    mkdir -p "$pkgdir/usr/share/themes/$_pkgname"
+    cp -r assets cinnamon gnome-shell gtk-* metacity-1 xfwm4 index.theme "$pkgdir/usr/share/themes/$_pkgname"
+    find "$pkgdir/usr/share/themes/$_pkgname" -name "*.scss" -exec rm -f {} \;
+    rm $pkgdir/usr/share/themes/$_pkgname/{cinnamon/thumbnail.png,gtk-2.0/{assets{.svg,.txt},links.fish,render-assets.sh}}
+
+## dracula grub
+    cp -r $srcdir/$_pkgname-grub/dracula "$pkgdir/boot/grub/themes"
+
+## dracula btop
+    cp -r $srcdir/$_pkgname-bashtop/*.theme "$pkgdir/usr/local/share/btop/themes/dracula-git.theme"
+
+    find "$pkgdir/usr/share/"{aurorae,color-schemes,icons,konsole,Kvantum,plasma,wallpapers}"" -name ".*" -exec rm -f {} \;
+    find "$pkgdir/" -type d -exec chmod 755 '{}' \;
+    find "$pkgdir/" -type f -exec chmod 644 '{}' \;
+}
