@@ -1,0 +1,131 @@
+# Maintainer: Denilson <depaiao a gmail com>
+
+pkgbase=sweet-kde-complete-git
+pkgname=(sweet-kde-complete-git)
+_pkgname=Sweet
+_pkgnameicons=candy-icons
+pkgver=r284.74fabbd
+pkgrel=1
+pkgdesc="Complete Sweet theme for KDE Plasma 5"
+arch=(any)
+url="https://github.com/EliverLara"
+license=('GPL3')
+options=('!strip')
+source=("Sweet::git+$url/$_pkgname.git#branch=nova"
+        "git+$url/$_pkgname-kde.git"
+        "Sweet-kde-ambar-blue::git+$url/$_pkgname-kde.git#branch=Ambar-Blue"
+        "Sweet-mars::git+$url/$_pkgname.git#branch=mars"
+        "Sweet-ambar-blue::git+$url/$_pkgname.git#branch=Ambar-Blue"
+        "git+$url/$_pkgnameicons.git")
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+depends=('git' 'hicolor-icon-theme' 'plasma-desktop' 'breeze-icons' 'konsole' 'kvantum-qt5' 'kwin' 'sddm' 'gtk2' 'gtk3' 'gtk4')
+makedepends=('git')
+provides=()
+conflicts=( 'aurorae-theme-sweet'
+            'aurorae-theme-sweet-mars'
+            'candy-icons'
+            'candy-icons-git'
+            'color-scheme-sweet'
+            'color-scheme-sweet-mars'
+            'konsole-colorscheme-sweet'
+            'kvantum-theme-sweet'
+            'kvantum-theme-sweet=git'
+            'kvantum-theme-sweet-mars-git'
+            'kvantum-theme-sweet-nova-git'
+            'plasma-theme-sweet'
+            'plasma-theme-sweet-mars'
+            'plasma5-theme-sweet-git'
+            'sddm-theme-sweet'
+            'sweet-cursor-theme-git'
+            'sweet-gtk-theme'
+            'sweet-gtk-theme-dark'
+            'sweet-gtk-theme-mars-git'
+            'sweet-gtk-theme-nova-git'
+            'sweet-kde'
+            'sweet-kde-git'
+            'sweet-kde-theme-mars-git'
+            'sweet-kde-theme-nova-git'
+            'sweet-mars-kde'
+            'sweet-theme-git'
+            'sweet-wallpapers'
+            'xcursor-sweet')
+
+pkgver(){
+  cd "$_pkgname"
+  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+package(){
+    pkgdesc="Sweet aurorae, color, konsole, sddm, kvantum, icons (Candy), cursor, wallpapers, global and plasma theme, gtk2/3/4"
+    install -dm755 $pkgdir/usr/share/{aurorae/themes,color-schemes,icons,konsole,Kvantum,plasma/{desktoptheme,look-and-feel},sddm/themes,themes,wallpapers}
+
+#    msg2
+
+## sweet plasma
+    cd $_pkgname/kde
+    cp -r aurorae/* "$pkgdir/usr/share/aurorae/themes"
+    cp -r colorschemes/*.colors "$pkgdir/usr/share/color-schemes"
+    cp -r cursors/$_pkgname-cursors "$pkgdir/usr/share/icons"
+    cp -r konsole/*.colorscheme "$pkgdir/usr/share/konsole"
+    #mkdir -p "$pkgdir/usr/share/Kvantum/"{$_pkgname,$_pkgname-transparent-toolbar}""
+    cp -r Kvantum/* "$pkgdir/usr/share/Kvantum/"
+    mkdir -p "$pkgdir/usr/share/plasma/look-and-feel/$_pkgname"
+    cp -r look-and-feel/* "$pkgdir/usr/share/plasma/look-and-feel/$_pkgname"
+    mkdir -p "$pkgdir/usr/share/sddm/themes/$_pkgname"
+    cp -r sddm/* "$pkgdir/usr/share/sddm/themes/$_pkgname"
+    mkdir -p "$pkgdir/usr/share/plasma/desktoptheme/$_pkgname"
+    cp -r $srcdir/$_pkgname-kde/* "$pkgdir/usr/share/plasma/desktoptheme/$_pkgname"
+    mkdir -p "$pkgdir/usr/share/wallpapers/$_pkgname-Wallpapers"
+    cp -r $srcdir/$_pkgname/extras/$_pkgname-Wallpapers/*.png "$pkgdir/usr/share/wallpapers/$_pkgname-Wallpapers"
+        
+## sweet-mars plasma
+    cd $srcdir/$_pkgname-mars/kde
+    cp -r aurorae/* "$pkgdir/usr/share/aurorae/themes"
+    cp -r colorschemes/*.colors "$pkgdir/usr/share/color-schemes"
+    cp -r konsole/*.colorscheme "$pkgdir/usr/share/konsole"
+    cp -r plasma/* "$pkgdir/usr/share/plasma"
+    cp -r kvantum/* "$pkgdir/usr/share/Kvantum/"
+    cp -r sddm/* "$pkgdir/usr/share/sddm/themes/"
+    
+## sweet-ambar-blue plasma
+    cd $srcdir/$_pkgname-ambar-blue/kde
+    cp -r aurorae/* "$pkgdir/usr/share/aurorae/themes"
+    cp -r colorschemes/*.colors "$pkgdir/usr/share/color-schemes"
+    cp -r konsole/*.colorscheme "$pkgdir/usr/share/konsole"
+    cp -r plasma/* "$pkgdir/usr/share/plasma"
+    mkdir -p "$pkgdir/usr/share/plasma/desktoptheme/$_pkgname-Ambar-Blue"
+    cp -r $srcdir/$_pkgname-kde-ambar-blue/* "$pkgdir/usr/share/plasma/desktoptheme/$_pkgname-Ambar-Blue"
+    cp -r kvantum/* "$pkgdir/usr/share/Kvantum/"
+    cp -r sddm/* "$pkgdir/usr/share/sddm/themes/"
+
+## sweet gtk
+    cd $srcdir/$_pkgname
+    mkdir -p "$pkgdir/usr/share/themes/$_pkgname"
+    cp -r assets cinnamon gnome-shell gtk-2.0 gtk-3.0 gtk-4.0 metacity-1 xfwm4 index.theme "$pkgdir/usr/share/themes/$_pkgname"
+    find "$pkgdir/usr/share/themes/$_pkgname" -name "*.scss" -exec rm -f {} \;
+    rm $pkgdir/usr/share/themes/$_pkgname/{cinnamon/thumbnail.png,gtk-2.0/{assets{.svg,.txt},links.fish,render-assets.sh}}
+
+## sweet-mars gtk
+    cd $srcdir/$_pkgname-mars
+    mkdir -p "$pkgdir/usr/share/themes/$_pkgname-mars"
+    cp -r assets cinnamon gnome-shell gtk-2.0 gtk-3.0 gtk-4.0 metacity-1 xfwm4 index.theme "$pkgdir/usr/share/themes/$_pkgname-mars"
+    find "$pkgdir/usr/share/themes/$_pkgname-mars" -name "*.scss" -exec rm -f {} \;
+    rm $pkgdir/usr/share/themes/$_pkgname-mars/{cinnamon/thumbnail.png,gtk-2.0/{assets{.svg,.txt},links.fish,render-assets.sh}}
+
+## sweet-ambar-blue gtk
+    cd $srcdir/$_pkgname-ambar-blue
+    mkdir -p "$pkgdir/usr/share/themes/$_pkgname-Ambar-Blue"
+    cp -r assets cinnamon gnome-shell gtk-2.0 gtk-3.0 gtk-4.0 metacity-1 xfwm4 index.theme "$pkgdir/usr/share/themes/$_pkgname-Ambar-Blue"
+    find "$pkgdir/usr/share/themes/$_pkgname-Ambar-Blue" -name "*.scss" -exec rm -f {} \;
+    rm $pkgdir/usr/share/themes/$_pkgname-Ambar-Blue/{cinnamon/thumbnail.png,gtk-2.0/{assets{.svg,.txt},links.fish,render-assets.sh}}
+    
+## candy icons
+    ln -srf $srcdir/$_pkgnameicons/apps/scalable/distributor-logo-archlinux.svg $srcdir/$_pkgnameicons/apps/scalable/distributor-logo.svg
+    ln -srf $srcdir/$_pkgnameicons/apps/scalable/distributor-logo-archlinux.svg $srcdir/$_pkgnameicons/apps/scalable/start-here.svg
+    cp -r $srcdir/$_pkgnameicons "$pkgdir/usr/share/icons"
+    rm -r "$pkgdir/usr/share/icons/$_pkgnameicons/"{preview,README.md,.git,.github}""
+
+    find "$pkgdir/usr/share/"{aurorae,color-schemes,icons,konsole,Kvantum,plasma,wallpapers}"" -name ".*" -exec rm -f {} \;
+    find "$pkgdir/usr/share/" -type d -exec chmod 755 '{}' \;
+    find "$pkgdir/usr/share/" -type f -exec chmod 644 '{}' \;
+}
